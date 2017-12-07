@@ -658,6 +658,12 @@ TESTS = [
         "dependencies": [MBED_LIBRARIES, TEST_MBED_LIB],
         "automated": False
     },
+    {
+        "id": "MBED_40", "description": "Sino:bit LED matrix",
+        "source_dir": join(TEST_DIR, "mbed", "sinobit_ledmatrix"),
+        "dependencies": [MBED_LIBRARIES, TEST_MBED_LIB],
+        "automated": False
+    },
 
     # USB Tests 
     # USB device test list
