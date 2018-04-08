@@ -63,18 +63,22 @@ sn_coap_hdr_s *sn_coap_build_response(struct coap_s *handle, sn_coap_hdr_s *coap
         return NULL;
     }
 
-    if (coap_packet_ptr->msg_type == COAP_MSG_TYPE_CONFIRMABLE) {
+    if (msg_code == COAP_MSG_CODE_REQUEST_GET) {
+        // Blockwise message response is new GET
+        coap_res_ptr->msg_type = COAP_MSG_TYPE_CONFIRMABLE;
+        coap_res_ptr->msg_code = (sn_coap_msg_code_e)msg_code;
+        /* msg_id needs to be set by the caller in this case */
+    }
+    else if (coap_packet_ptr->msg_type == COAP_MSG_TYPE_CONFIRMABLE) {
         coap_res_ptr->msg_type = COAP_MSG_TYPE_ACKNOWLEDGEMENT;
         coap_res_ptr->msg_code = (sn_coap_msg_code_e)msg_code;
         coap_res_ptr->msg_id = coap_packet_ptr->msg_id;
     }
-
     else if (coap_packet_ptr->msg_type == COAP_MSG_TYPE_NON_CONFIRMABLE) {
         coap_res_ptr->msg_type = COAP_MSG_TYPE_NON_CONFIRMABLE;
         coap_res_ptr->msg_code = (sn_coap_msg_code_e)msg_code;
         /* msg_id needs to be set by the caller in this case */
     }
-
     else {
         handle->sn_coap_protocol_free( coap_res_ptr );
         return NULL;
@@ -337,7 +341,9 @@ uint16_t sn_coap_builder_calc_needed_packet_data_size_2(sn_coap_hdr_s *src_coap_
             }
         }
 #if SN_COAP_MAX_BLOCKWISE_PAYLOAD_SIZE
-        if ((src_coap_msg_ptr->payload_len > blockwise_payload_size) && (blockwise_payload_size > 0)) {
+        if ((src_coap_msg_ptr->payload_len > SN_COAP_MAX_NONBLOCKWISE_PAYLOAD_SIZE) &&
+            (src_coap_msg_ptr->payload_len > blockwise_payload_size) &&
+            (blockwise_payload_size > 0)) {
             returned_byte_count += blockwise_payload_size;
         } else {
             returned_byte_count += src_coap_msg_ptr->payload_len;

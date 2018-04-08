@@ -28,10 +28,7 @@
 #include "em_cmu.h"
 #include "em_timer.h"
 #include "clocking.h"
-#include "sleep_api.h"
-#include "sleepmodes.h"
 
-#define TIMER_LEAST_ACTIVE_SLEEPMODE EM1
 /**
  * Timer functions for microsecond ticker.
  * mbed expects a 32-bit timer. Since the EFM32 only has 16-bit timers,
@@ -159,10 +156,6 @@ void us_ticker_set_interrupt(timestamp_t timestamp)
     uint32_t goal = timestamp;
     uint32_t trigger;
 
-    if((US_TICKER_TIMER->IEN & TIMER_IEN_CC0) == 0) {
-        //Timer was disabled, but is going to be enabled. Set sleep mode.
-        blockSleepMode(TIMER_LEAST_ACTIVE_SLEEPMODE);
-    }
     TIMER_IntDisable(US_TICKER_TIMER, TIMER_IEN_CC0);
 
     /* convert us delta value back to timer ticks */
@@ -216,10 +209,6 @@ void us_ticker_fire_interrupt(void)
 
 void us_ticker_disable_interrupt(void)
 {
-    if((US_TICKER_TIMER->IEN & TIMER_IEN_CC0) != 0) {
-        //Timer was enabled, but is going to get disabled. Clear sleepmode.
-        unblockSleepMode(TIMER_LEAST_ACTIVE_SLEEPMODE);
-    }
     /* Disable compare channel interrupts */
     TIMER_IntDisable(US_TICKER_TIMER, TIMER_IEN_CC0);
 }

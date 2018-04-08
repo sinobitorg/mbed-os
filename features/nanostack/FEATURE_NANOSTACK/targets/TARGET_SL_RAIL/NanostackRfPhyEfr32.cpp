@@ -18,7 +18,7 @@
 #include <string.h>
 
 #include "mbed.h"
-#include "mbed_sleep.h"
+#include "mbed_power_mgmt.h"
 #include "ns_types.h"
 #include "platform/arm_hal_interrupt.h"
 #include "nanostack/platform/arm_hal_phy.h"
@@ -62,7 +62,7 @@ enum RFThreadSignal {
     SL_QUEUE_FULL       = (1 << 11),
 
     // ACK pend flag can be signalled in addition to RX_DONE
-    SL_ACK_PEND         = (1 << 31),
+    SL_ACK_PEND         = (1 << 30),
 };
 
 /*  Adaptor thread definitions */

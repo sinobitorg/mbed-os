@@ -35,6 +35,11 @@ int ProfilingBlockDevice::deinit()
     return _bd->deinit();
 }
 
+int ProfilingBlockDevice::sync()
+{
+    return _bd->sync();
+}
+
 int ProfilingBlockDevice::read(void *b, bd_addr_t addr, bd_size_t size)
 {
     int err = _bd->read(b, addr, size);
@@ -75,6 +80,16 @@ bd_size_t ProfilingBlockDevice::get_program_size() const
 bd_size_t ProfilingBlockDevice::get_erase_size() const
 {
     return _bd->get_erase_size();
+}
+
+bd_size_t ProfilingBlockDevice::get_erase_size(bd_addr_t addr) const
+{
+    return _bd->get_erase_size(addr);
+}
+
+int ProfilingBlockDevice::get_erase_value() const
+{
+    return _bd->get_erase_value();
 }
 
 bd_size_t ProfilingBlockDevice::size() const

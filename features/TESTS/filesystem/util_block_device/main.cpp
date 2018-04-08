@@ -26,6 +26,11 @@
 
 using namespace utest::v1;
 
+// TODO HACK, replace with available ram/heap property
+#if defined(TARGET_MTB_MTS_XDOT)
+    #error [NOT_SUPPORTED] Insufficient heap for heap block device tests
+#endif
+
 #define BLOCK_COUNT 16
 #define BLOCK_SIZE 512
 
@@ -43,6 +48,7 @@ void test_slicing() {
     TEST_ASSERT_EQUAL(0, err);
 
     TEST_ASSERT_EQUAL(BLOCK_SIZE, slice1.get_program_size());
+    TEST_ASSERT_EQUAL(BLOCK_SIZE, slice1.get_erase_size(BLOCK_SIZE));
     TEST_ASSERT_EQUAL((BLOCK_COUNT/2)*BLOCK_SIZE, slice1.size());
 
     // Fill with random sequence
@@ -137,6 +143,7 @@ void test_chaining() {
     TEST_ASSERT_EQUAL(0, err);
 
     TEST_ASSERT_EQUAL(BLOCK_SIZE, chain.get_program_size());
+    TEST_ASSERT_EQUAL(BLOCK_SIZE, chain.get_erase_size((BLOCK_COUNT/2)*BLOCK_SIZE+1));
     TEST_ASSERT_EQUAL(BLOCK_COUNT*BLOCK_SIZE, chain.size());
 
     // Fill with random sequence

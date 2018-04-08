@@ -841,10 +841,16 @@ EXCLUDE_PATTERNS       = */tools/* \
                          */BUILD/* \
                          */rtos/TARGET_CORTEX/rtx* \
                          */cmsis/* \
-                         */FEATURE_* \
                          */features/mbedtls/* \
                          */features/storage/* \
                          */features/unsupported/* \
+                         */features/FEATURE_COMMON_PAL/* \
+                         */features/FEATURE_LWIP/* \
+                         */features/FEATURE_UVISOR/* \
+                         */features/nanostack/FEATURE_NANOSTACK/sal-stack-nanostack/* \
+                         */features/nanostack/FEATURE_NANOSTACK/coap-service/* \
+                         */ble/generic/* \
+                         */ble/pal/*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
@@ -2065,6 +2071,7 @@ PREDEFINED             = DOXYGEN_ONLY            \
                          DEVICE_I2CSLAVE         \
                          DEVICE_I2C_ASYNCH       \
                          DEVICE_INTERRUPTIN      \
+                         DEVICE_ITM              \
                          DEVICE_LOWPOWERTIMER    \
                          DEVICE_PORTIN           \
                          DEVICE_PORTINOUT        \
@@ -2081,7 +2088,8 @@ PREDEFINED             = DOXYGEN_ONLY            \
                          DEVICE_SPISLAVE         \
                          DEVICE_STORAGE          \
                          "MBED_DEPRECATED_SINCE(d, m)=" \
-                         "MBED_ENABLE_IF_CALLBACK_COMPATIBLE(F, M)="
+                         "MBED_ENABLE_IF_CALLBACK_COMPATIBLE(F, M)=" \
+                         "MBED_DEPRECATED(s)="
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

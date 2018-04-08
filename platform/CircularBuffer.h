@@ -17,8 +17,26 @@
 #define MBED_CIRCULARBUFFER_H
 
 #include "platform/mbed_critical.h"
+#include "platform/mbed_assert.h"
 
 namespace mbed {
+
+namespace internal {
+/* Detect if CounterType of the Circular buffer is of unsigned type. */
+template<typename T>
+struct is_unsigned { static const bool value = false; };
+template<>
+struct is_unsigned<unsigned char> { static const bool value = true; };
+template<>
+struct is_unsigned<unsigned short> { static const bool value = true; };
+template<>
+struct is_unsigned<unsigned int> { static const bool value = true; };
+template<>
+struct is_unsigned<unsigned long> { static const bool value = true; };
+template<>
+struct is_unsigned<unsigned long long> { static const bool value = true; };
+};
+
 /** \addtogroup platform */
 /** @{*/
 /**
@@ -29,11 +47,22 @@ namespace mbed {
 /** Templated Circular buffer class
  *
  *  @note Synchronization level: Interrupt safe
+ *  @note CounterType must be unsigned and consistent with BufferSize
  */
 template<typename T, uint32_t BufferSize, typename CounterType = uint32_t>
 class CircularBuffer {
 public:
     CircularBuffer() : _head(0), _tail(0), _full(false) {
+        MBED_STATIC_ASSERT(
+            internal::is_unsigned<CounterType>::value,
+            "CounterType must be unsigned"
+        );
+
+        MBED_STATIC_ASSERT(
+            (sizeof(CounterType) >= sizeof(uint32_t)) ||
+            (BufferSize < (((uint64_t) 1) << (sizeof(CounterType) * 8))),
+            "Invalid BufferSize for the CounterType"
+        );
     }
 
     ~CircularBuffer() {
@@ -60,7 +89,7 @@ public:
 
     /** Pop the transaction from the buffer
      *
-     * @param data Data to be pushed to the buffer
+     * @param data Data to be popped from the buffer
      * @return True if the buffer is not empty and data contains a transaction, false otherwise
      */
     bool pop(T& data) {
@@ -125,6 +154,22 @@ public:
         core_util_critical_section_exit();
         return elements;
     }
+
+    /** Peek into circular buffer without popping
+     *
+     * @param data Data to be peeked from the buffer
+     * @return True if the buffer is not empty and data contains a transaction, false otherwise
+     */
+    bool peek(T& data) const {
+        bool data_updated = false;
+        core_util_critical_section_enter();
+        if (!empty()) {
+            data = _pool[_tail];
+            data_updated = true;
+        }
+        core_util_critical_section_exit();
+        return data_updated;
+    }
     
 private:
     T _pool[BufferSize];
@@ -140,4 +185,3 @@ private:
 }
 
 #endif
-
